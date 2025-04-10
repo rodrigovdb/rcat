@@ -1,0 +1,5 @@
+services:
+  app:
+    image: rust:latest
+    volumes:
+      - .:/var/app
