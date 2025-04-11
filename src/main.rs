@@ -1,8 +1,10 @@
 use std::env;
+use std::process;
 
-/// Import functions defined on lib.rs
-use rcat::rcat;
-use rcat::validate_files_existence;
+/// Import functions defined on lib.rs to use here.
+/// But instead of doing that, we can refer to the module directly.
+// use rcat::rcat;
+// use rcat::validate_files_existence;
 
 fn main() {
     // Skip the first argument, which is the script name
@@ -11,7 +13,7 @@ fn main() {
     // Validates if at least one file is provided
     check_args(&args);
 
-    let response = rcat(&args);
+    let response = rcat::cat(&args);
     println!("{}", response);
 }
 
@@ -21,14 +23,14 @@ fn check_args(args: &[String]) {
     if args.is_empty() {
         usage();
 
-        std::process::exit(1);
+        process::exit(1);
     }
 
-    // Check if the provided arguments are existent files
-    if let Err(err) = std::panic::catch_unwind(|| validate_files_existence(&args)) {
-        eprintln!("Error: {:?}", err);
-        std::process::exit(1);
-    }
+    rcat::validate_files_existence(&args).unwrap_or_else(|err| {
+        println!("{}", err);
+        usage();
+        process::exit(1);
+    });
 }
 
 /// Prints the usage instructions for the program.
