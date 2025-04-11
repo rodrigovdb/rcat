@@ -1,5 +1,8 @@
 use std::env;
-use std::fs;
+
+/// Import functions defined on lib.rs
+use rcat::rcat;
+use rcat::validate_files_existence;
 
 fn main() {
     // Skip the first argument, which is the script name
@@ -22,11 +25,9 @@ fn check_args(args: &[String]) {
     }
 
     // Check if the provided arguments are existent files
-    for file in args {
-        if !fs::metadata(file).is_ok() {
-            eprintln!("File {} does not exist.", file);
-            std::process::exit(1);
-        }
+    if let Err(err) = std::panic::catch_unwind(|| validate_files_existence(&args)) {
+        eprintln!("Error: {:?}", err);
+        std::process::exit(1);
     }
 }
 
@@ -34,49 +35,4 @@ fn check_args(args: &[String]) {
 fn usage() {
     eprintln!("Usage: rcat <file1> <file2> ...");
     eprintln!("Concatenates and prints the contents of the specified files.");
-}
-
-/// Reads the contents of the files and concatenates them into a single string.
-fn rcat(args: &[String]) -> String {
-    // This is the response, we'll accumulate the content of all files here
-    let mut response = String::new();
-
-    // Iterate over each file provided in the arguments and add to the accumulated response
-    for file in &args[0..] {
-        match fs::read_to_string(file) {
-            Ok(content) => response.push_str(&content),
-            Err(e) => eprintln!("Error reading file {}: {}", file, e),
-        }
-    }
-
-    response
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn check_args_success() {
-        let args = vec![
-            String::from("fixtures/file_one"),
-            String::from("fixtures/file_two"),
-        ];
-
-        // Ensure check_args does not panic for valid arguments
-        check_args(&args);
-    }
-
-    #[test]
-    fn rcat_success() {
-        let args = vec![
-            String::from("fixtures/file_one"),
-            String::from("fixtures/file_two"),
-        ];
-        
-        let result = rcat(&args);
-
-        let expected = "First File\nSecond File\n";
-        assert_eq!(result, expected);
-    }
 }

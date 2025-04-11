@@ -7,6 +7,17 @@ tl;dr
 $ docker-compose run --build --rm app bash
 ```
 
+Once inside the container,
+
+```zsh
+$ rcat <file1> [<file2> ... <filen>]
+```
+
+Running tests
+```zsh
+$ cargo test -- --show-output
+```
+
 # To revisit and learn more
 
 - [Ownership](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html)
