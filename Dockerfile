@@ -14,4 +14,7 @@ COPY Cargo.toml Cargo.lock ./
 # Build the dependencies without the actual source code to cache dependencies separately
 RUN cargo build
 
+# Make the executble available in the final image
+RUN ln -s ${APP_HOME}/target/debug/rcat /usr/bin/rcat
+
 CMD ["cargo", "run"]

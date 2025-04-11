@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "rustcat"
+name = "rcat"
 version = "0.1.0"
