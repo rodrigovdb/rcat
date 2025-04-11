@@ -1,5 +1,9 @@
 # Docker
 
+The docker image will compile the program and then link the executable to `/usr/bin/rcat`.
+
+## Running commands
+
 One command to rule them all
 ```zsh
 $ docker-compose run --build --rm app  
