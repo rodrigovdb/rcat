@@ -26,8 +26,8 @@ impl Arguments {
         Arguments { options, files }
     }
     
-    pub fn has_option(&self, option: String) -> bool {
-        self.options.contains(&option)
+    pub fn has_option(&self, option: &str) -> bool {
+        self.options.contains(&option.to_string())
     }
 
     pub fn files(&self) -> &Vec<String> {
@@ -75,9 +75,9 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
 
     for filepath in arguments.files() {
         // Adds an empty line beween each file.
-        if arguments.has_option(String::from("-l")) && !first {
+        if arguments.has_option("-l") && !first {
             // If we are counting lines, we need to add the line number.
-            if arguments.has_option(String::from("-n")) {
+            if arguments.has_option("-n") {
                 response.push_str(&format!("{} ", count));
                 count += 1;
             }
@@ -124,20 +124,20 @@ fn parse_line(line: String, arguments: &Arguments, count: &mut usize) -> String 
     let mut response = String::new();
 
     // Add the line number at the beginning of the line, when the -n option is used.
-    if arguments.has_option(String::from("-n")) {
+    if arguments.has_option("-n") {
         response.push_str(&format!("{} ", count));
         *count += 1;
     }
 
     // Replace \t with ^I when the -T option is used.
-    if arguments.has_option(String::from("-T")) {
+    if arguments.has_option("-T") {
         response = line.replace("\t", "^I");
     } else {
         response.push_str(&line);
     }
 
     // Add the $ char to the end of the line, when the -E option is used.
-    if arguments.has_option(String::from("-E")) {
+    if arguments.has_option("-E") {
         response.push_str("$");
     }
 

@@ -10,7 +10,7 @@ fn main() {
     let arguments:Arguments = Arguments::new(&args);
 
     // Check if the user has provided the help option.
-    if arguments.has_option(String::from("-h")) {
+    if arguments.has_option("-h") || arguments.has_option("--help") {
         eprintln!("\n");
         usage();
         process::exit(0);
