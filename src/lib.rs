@@ -37,6 +37,7 @@ impl Arguments {
     pub fn available_options() -> Vec<(&'static str, &'static str)> {
         vec![
             ("-E", "Display a `$` at the end of each line"),
+            ("-n", "Number all output lines"),
             ("-T", "Display tab characters as `^I`"),
             ("-l", "Adds an empty line between each file"),
             ("-h", "Show this help"),
@@ -70,13 +71,21 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
     let mut first = true;
+    let mut count:usize = 1;
 
     for filepath in arguments.files() {
+        // Adds an empty line beween each file.
         if arguments.has_opion(String::from("-l")) && !first {
+            // If we are counting lines, we need to add the line number.
+            if arguments.has_opion(String::from("-n")) {
+                response.push_str(&format!("{} ", count));
+                count += 1;
+            }
+
             response.push_str("\n");
         }
 
-        match parse_file(filepath, &arguments) {
+        match parse_file(filepath, &arguments, &mut count) {
             Ok(content) => response.push_str(&content),
             Err(e) => return Err(format!("Error reading file {}: {}", filepath, e).into()),
         }
@@ -91,29 +100,43 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
  * Get a file path and open the file.
  * Read the file line by line and return the content as a string.
  */
-fn parse_file(filepath: &String, arguments: &Arguments) -> Result<String, Box<dyn Error>> {
+ fn parse_file(filepath: &String, arguments: &Arguments, count: &mut usize) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
     let file = File::open(filepath)?;
     let reader = io::BufReader::new(file);
 
     for line in reader.lines() {
-        let parsed_line = parse_line(line?, &arguments);
+        let parsed_line = parse_line(line?, &arguments, count);
         response.push_str(parsed_line.as_str());
     }
 
     Ok(response)
 }
 
-fn parse_line(line: String, arguments: &Arguments) -> String {
+/**
+ * Receives a line and an instance of Arguments.
+ * Also receives a mutable reference to a counter to update the line number.
+ * It parses the line according to the options provided in Arguments.
+ * Returns the parsed line.
+ */
+fn parse_line(line: String, arguments: &Arguments, count: &mut usize) -> String {
     let mut response = String::new();
 
+    // Add the line number at the beginning of the line, when the -n option is used.
+    if arguments.has_opion(String::from("-n")) {
+        response.push_str(&format!("{} ", count));
+        *count += 1;
+    }
+
+    // Replace \t with ^I when the -T option is used.
     if arguments.has_opion(String::from("-T")) {
         response = line.replace("\t", "^I");
     } else {
         response.push_str(&line);
     }
 
+    // Add the $ char to the end of the line, when the -E option is used.
     if arguments.has_opion(String::from("-E")) {
         response.push_str("$");
     }

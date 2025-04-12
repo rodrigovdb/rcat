@@ -15,7 +15,7 @@ $ rcat -h
 
 And then run the command with some files
 ```zsh
-$ rcat -T -l fixtures/file1 fixtures/file2
+$ rcat -n -l fixtures/file1 fixtures/file2
 ```
 
 # To revisit and learn more
