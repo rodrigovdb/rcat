@@ -11,19 +11,23 @@ pub struct Arguments {
     files: Vec<String>,
 }
 impl Arguments {
-    pub fn new(args: &[String]) -> Arguments {
+    pub fn new(args: &[String]) -> Result<Arguments, String> {
         let mut options = Vec::new();
         let mut files = Vec::new();
 
         for arg in args {
             if arg.starts_with('-') {
-                options.push(arg.clone());
+                if Arguments::available_options().iter().any(|(opt, _)| opt == arg) {
+                    options.push(arg.clone());
+                } else {
+                    return Err(format!("Invalid option: {}", arg));
+                }
             } else {
                 files.push(arg.clone());
             }
         }
 
-        Arguments { options, files }
+        Ok(Arguments { options, files })
     }
     
     pub fn has_option(&self, option: &str) -> bool {
