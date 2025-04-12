@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use std::error::Error;
 
 // use std::fs;
@@ -38,14 +40,14 @@ impl Arguments {
         &self.files
     }
 
-    pub fn available_options() -> Vec<(&'static str, &'static str)> {
-        vec![
+    pub fn available_options() -> HashMap<&'static str, &'static str> {
+        HashMap::from([
             ("-E", "Display a `$` at the end of each line"),
             ("-n", "Number all output lines"),
             ("-T", "Display tab characters as `^I`"),
             ("-l", "Adds an empty line between each file"),
             ("-h", "Show this help"),
-        ]
+        ])
     }
 }
 
