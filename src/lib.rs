@@ -1,5 +1,9 @@
-use std::fs;
 use std::error::Error;
+
+// use std::fs;
+use std::io;
+use std::io::prelude::*;
+use std::fs::File;
 
 // #[derive(Debug)]
 pub struct Arguments {
@@ -50,15 +54,40 @@ pub fn usage() {
     eprintln!("\n");
 }
 
+/**
+ * Receives an instance of Arguments, which has the files to be read.
+ * It parses each one and returns the content as a string.
+ * If an error occurs, it returns an error message.
+ */
 pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
-    for file in arguments.files() {
-        match fs::read_to_string(file) {
+    for filepath in arguments.files() {
+        match parse_file(filepath) {
             Ok(content) => response.push_str(&content),
-            Err(e) => return Err(format!("Error reading file {}: {}", file, e).into()),
+            Err(e) => return Err(format!("Error reading file {}: {}", filepath, e).into()),
         }
     }
 
     return Ok(response);
+}
+
+/**
+ * Get a file path and open the file.
+ * Read the file line by line and return the content as a string.
+ */
+fn parse_file(filepath: &String) -> Result<String, Box<dyn Error>> {
+    let mut response = String::new();
+
+    let file = File::open(filepath)?;
+    let reader = io::BufReader::new(file);
+
+    for line in reader.lines() {
+        let line = line?;
+
+        response.push_str(&line);
+        response.push('\n');
+    }
+
+    Ok(response)
 }
