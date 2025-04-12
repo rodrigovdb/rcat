@@ -63,7 +63,7 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
     for filepath in arguments.files() {
-        match parse_file(filepath) {
+        match parse_file(filepath, &arguments) {
             Ok(content) => response.push_str(&content),
             Err(e) => return Err(format!("Error reading file {}: {}", filepath, e).into()),
         }
@@ -76,18 +76,40 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
  * Get a file path and open the file.
  * Read the file line by line and return the content as a string.
  */
-fn parse_file(filepath: &String) -> Result<String, Box<dyn Error>> {
+fn parse_file(filepath: &String, arguments: &Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
     let file = File::open(filepath)?;
     let reader = io::BufReader::new(file);
 
+    let mut line_count = 1;
     for line in reader.lines() {
-        let line = line?;
-
-        response.push_str(&line);
-        response.push('\n');
+        let parsed_line = parse_line(line?, &arguments, line_count);
+        response.push_str(parsed_line.as_str());
+        line_count += 1;
     }
 
     Ok(response)
+}
+
+fn parse_line(line: String, arguments: &Arguments, line_count: usize) -> String {
+    let mut response = String::new();
+
+    if arguments.has_opion(String::from("-n")) {
+        response.push_str(&format!("{} ", line_count));
+    }
+
+    if arguments.has_opion(String::from("-T")) {
+        response = line.replace("\t", "^I");
+    } else {
+        response.push_str(&line);
+    }
+
+    if arguments.has_opion(String::from("-E")) {
+        response.push_str("$");
+    }
+
+    response.push_str("\n");
+
+    response
 }
