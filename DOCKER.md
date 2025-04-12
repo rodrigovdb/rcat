@@ -26,17 +26,12 @@ Running a bash into the container
 $ docker run -it cat-rust bash
 ```
 
-Compiling
+Running rcat
 ```zsh
-$ rustc main.rs
+$ rcat -h
 ```
 
-Running
-```zsh
-$ ./main
-```
-
-# Docker Compose
+## Working with  Docker Compose
 
 Build
 ```zsh
@@ -51,4 +46,9 @@ $ docker-compose run --rm app
 Bash
 ```zsh
 $ docker-compose run --rm app bash
+```
+
+Running rcat
+```zsh
+$ rcat -h
 ```
