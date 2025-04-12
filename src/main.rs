@@ -1,23 +1,27 @@
 use std::{env, process};
-use rcat::{ensure_valid_args, usage, cat};
+use rcat::{usage, cat};
+
+use rcat::Arguments;
 
 fn main() {
     // Skip the first argument, which is the script name
+    // and sanitize the rest of them.
     let args: Vec<String> = env::args().skip(1).collect();
+    let arguments:Arguments = Arguments::new(&args);
 
-    // Validates if at least one file is provided
-    if let Err(err) = ensure_valid_args(&args) {
-        eprintln!("\nERROR: {}\n", err);
+    // Check if the user has provided the help option.
+    if arguments.has_opion(String::from("-h")) || arguments.has_opion(String::from("--help")) {
+        eprintln!("\n");
         usage();
-        process::exit(1);
+        process::exit(0);
     }
 
-    match cat(&args) {
+    match cat(arguments) {
         Ok(response) => {
             println!("{}", response);
         }
         Err(err) => {
-            dbg!(&err);
+            eprintln!("\nRuntime Error: {}\n", err);
             process::exit(1);
         }
     }

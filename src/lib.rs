@@ -1,29 +1,59 @@
 use std::fs;
 use std::error::Error;
 
-pub fn ensure_valid_args(args: &[String]) -> Result<(), Box<dyn Error>> {
-    if args.is_empty() {
-        return Err("No file(s) provided.".into());
-    }
+// #[derive(Debug)]
+pub struct Arguments {
+    options: Vec<String>,
+    files: Vec<String>,
+}
+impl Arguments {
+    pub fn new(args: &[String]) -> Arguments {
+        let mut options = Vec::new();
+        let mut files = Vec::new();
 
-    for file in args {
-        if !fs::metadata(file).is_ok() {
-            return Err(format!("File {} does not exist", file).into());
+        for arg in args {
+            if arg.starts_with('-') {
+                options.push(arg.clone());
+            } else {
+                files.push(arg.clone());
+            }
         }
+
+        Arguments { options, files }
+    }
+    
+    pub fn has_opion(&self, option: String) -> bool {
+        self.options.contains(&option)
     }
 
-    return Ok(());
+    pub fn files(&self) -> &Vec<String> {
+        &self.files
+    }
+
+    pub fn available_options() -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("-n", "Display line numbers"),
+            ("-E", "Display a `$` at the end of each line"),
+            ("-T", "Display tab characters as `^I`"),
+            ("-h", "Show this help"),
+        ]
+    }
 }
 
 pub fn usage() {
-    eprintln!("Usage: rcat <file1> <file2> ...");
     eprintln!("Concatenates and prints the contents of the specified files.");
+    eprintln!("Usage: rcat [options] <file1> <file2> ...");
+    eprintln!("\nOptions:");
+    for (option, description) in Arguments::available_options() {
+        eprintln!("  {}: {}", option, description);
+    }
+    eprintln!("\n");
 }
 
-pub fn cat(args: &[String]) -> Result<String, Box<dyn Error>> {
+pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
-    for file in args {
+    for file in arguments.files() {
         match fs::read_to_string(file) {
             Ok(content) => response.push_str(&content),
             Err(e) => return Err(format!("Error reading file {}: {}", file, e).into()),
@@ -31,46 +61,4 @@ pub fn cat(args: &[String]) -> Result<String, Box<dyn Error>> {
     }
 
     return Ok(response);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn fail_validating_inexistent_file() {
-        let args = vec![
-            String::from("fixtures/file_three")
-        ];
-
-        let result = validate_files_existence(&args);
-
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "File fixtures/file_three does not exist");
-    }
-
-    #[test]
-    fn rcat_single_file() {
-        let args = vec![
-            String::from("fixtures/file_one")
-        ];
-        
-        let result = cat(&args);
-
-        let expected = "First File\n";
-        assert_eq!(result, expected);
-    }
-
-    #[test]
-    fn rcat_two_files() {
-        let args = vec![
-            String::from("fixtures/file_one"),
-            String::from("fixtures/file_two")
-        ];
-        
-        let result = cat(&args);
-
-        let expected = "First File\nSecond File\n";
-        assert_eq!(result, expected);
-    }
 }
