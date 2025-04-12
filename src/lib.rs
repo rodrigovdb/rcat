@@ -36,7 +36,6 @@ impl Arguments {
 
     pub fn available_options() -> Vec<(&'static str, &'static str)> {
         vec![
-            ("-n", "Display line numbers"),
             ("-E", "Display a `$` at the end of each line"),
             ("-T", "Display tab characters as `^I`"),
             ("-l", "Adds an empty line between each file"),
@@ -47,11 +46,18 @@ impl Arguments {
 
 pub fn usage() {
     eprintln!("Concatenates and prints the contents of the specified files.");
-    eprintln!("Usage: rcat [options] <file1> <file2> ...");
+    eprintln!("Usage: rcat [options] file1 [<file2> ... <fileN>]");
+
     eprintln!("\nOptions:");
     for (option, description) in Arguments::available_options() {
         eprintln!("  {}: {}", option, description);
     }
+
+    eprintln!("\nExamples:");
+    eprintln!("  rcat file1.txt");
+    eprintln!("  rcat -l -E file1.txt file2.txt");
+    eprintln!("  rcat -T -l file1.txt file2.txt > output.txt");
+
     eprintln!("\n");
 }
 
@@ -91,22 +97,16 @@ fn parse_file(filepath: &String, arguments: &Arguments) -> Result<String, Box<dy
     let file = File::open(filepath)?;
     let reader = io::BufReader::new(file);
 
-    let mut line_count = 1;
     for line in reader.lines() {
-        let parsed_line = parse_line(line?, &arguments, line_count);
+        let parsed_line = parse_line(line?, &arguments);
         response.push_str(parsed_line.as_str());
-        line_count += 1;
     }
 
     Ok(response)
 }
 
-fn parse_line(line: String, arguments: &Arguments, line_count: usize) -> String {
+fn parse_line(line: String, arguments: &Arguments) -> String {
     let mut response = String::new();
-
-    if arguments.has_opion(String::from("-n")) {
-        response.push_str(&format!("{} ", line_count));
-    }
 
     if arguments.has_opion(String::from("-T")) {
         response = line.replace("\t", "^I");

@@ -4,18 +4,18 @@
 
 tl;dr
 ```zsh
+$ docker-compose build
 $ docker-compose run --build --rm app bash
 ```
 
 Once inside the container,
-
 ```zsh
-$ rcat <file1> [<file2> ... <filen>]
+$ rcat -h
 ```
 
-Running tests
+And then run the command with some files
 ```zsh
-$ cargo test -- --show-output
+$ rcat -T -l fixtures/file1 fixtures/file2
 ```
 
 # To revisit and learn more
