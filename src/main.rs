@@ -10,12 +10,13 @@ fn main() {
     let arguments:Arguments = Arguments::new(&args);
 
     // Check if the user has provided the help option.
-    if arguments.has_opion(String::from("-h")) || arguments.has_opion(String::from("--help")) {
+    if arguments.has_option(String::from("-h")) {
         eprintln!("\n");
         usage();
         process::exit(0);
     }
 
+    // Run the cat thing.
     match cat(arguments) {
         Ok(response) => {
             println!("{}", response);

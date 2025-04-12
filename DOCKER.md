@@ -6,7 +6,7 @@ The docker image will compile the program and then link the executable to `/usr/
 
 TL;DR - One command to rule them all
 ```zsh
-$ docker-compose run --build --rm app  
+$ docker-compose run --build --rm app bash
 ```
 
 ## Working with the container
