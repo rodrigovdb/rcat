@@ -106,7 +106,7 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
  * Get a file path and open the file.
  * Read the file line by line and return the content as a string.
  */
- fn parse_file(filepath: &String, arguments: &Arguments, count: &mut usize) -> Result<String, Box<dyn Error>> {
+ fn parse_file(filepath: &str, arguments: &Arguments, count: &mut usize) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
     let file = File::open(filepath)?;
@@ -135,19 +135,21 @@ fn parse_line(line: String, arguments: &Arguments, count: &mut usize) -> String 
         *count += 1;
     }
 
-    // Replace \t with ^I when the -T option is used.
-    if arguments.has_option("-T") {
-        response = line.replace("\t", "^I");
+    // Replace tabs if -T is used
+    let processed_line = if arguments.has_option("-T") {
+        line.replace("\t", "^I")
     } else {
-        response.push_str(&line);
-    }
+        line
+    };
+
+    response.push_str(&processed_line);
 
     // Add the $ char to the end of the line, when the -E option is used.
     if arguments.has_option("-E") {
-        response.push_str("$");
+        response.push('$');
     }
 
-    response.push_str("\n");
+    response.push('\n');
 
     response
 }
