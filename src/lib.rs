@@ -39,6 +39,7 @@ impl Arguments {
             ("-n", "Display line numbers"),
             ("-E", "Display a `$` at the end of each line"),
             ("-T", "Display tab characters as `^I`"),
+            ("-l", "Adds an empty line between each file"),
             ("-h", "Show this help"),
         ]
     }
@@ -62,11 +63,19 @@ pub fn usage() {
 pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
 
+    let mut first = true;
+
     for filepath in arguments.files() {
+        if arguments.has_opion(String::from("-l")) && !first {
+            response.push_str("\n");
+        }
+
         match parse_file(filepath, &arguments) {
             Ok(content) => response.push_str(&content),
             Err(e) => return Err(format!("Error reading file {}: {}", filepath, e).into()),
         }
+
+        first = false
     }
 
     return Ok(response);
