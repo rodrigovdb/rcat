@@ -4,7 +4,6 @@
 
 tl;dr
 ```zsh
-$ docker-compose build
 $ docker-compose run --build --rm app bash
 ```
 
