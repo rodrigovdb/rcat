@@ -1,32 +1,36 @@
 use std::fs;
+use std::error::Error;
 
-pub fn validate_files_existence(args: &[String]) -> Result<(), &'static str> {
-    // Check if the provided arguments are existent files
+pub fn ensure_valid_args(args: &[String]) -> Result<(), Box<dyn Error>> {
+    if args.is_empty() {
+        return Err("No file(s) provided.".into());
+    }
+
     for file in args {
         if !fs::metadata(file).is_ok() {
-            let msg = format!("File {} does not exist", file);
-
-            return Err(Box::leak(msg.into_boxed_str()));
+            return Err(format!("File {} does not exist", file).into());
         }
     }
 
     return Ok(());
 }
 
-/// Reads the contents of the files and concatenates them into a single string.
-pub fn cat(args: &[String]) -> String {
-  // This is the response, we'll accumulate the content of all files here
-  let mut response = String::new();
+pub fn usage() {
+    eprintln!("Usage: rcat <file1> <file2> ...");
+    eprintln!("Concatenates and prints the contents of the specified files.");
+}
 
-  // Iterate over each file provided in the arguments and add to the accumulated response
-  for file in &args[0..] {
-      match fs::read_to_string(file) {
-          Ok(content) => response.push_str(&content),
-          Err(e) => eprintln!("Error reading file {}: {}", file, e),
-      }
-  }
+pub fn cat(args: &[String]) -> Result<String, Box<dyn Error>> {
+    let mut response = String::new();
 
-  response
+    for file in args {
+        match fs::read_to_string(file) {
+            Ok(content) => response.push_str(&content),
+            Err(e) => return Err(format!("Error reading file {}: {}", file, e).into()),
+        }
+    }
+
+    return Ok(response);
 }
 
 #[cfg(test)]
