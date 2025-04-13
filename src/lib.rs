@@ -91,7 +91,7 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
             response.push_str("\n");
         }
 
-        match parse_file(filepath, &arguments, &mut count) {
+        match parse_file(&filepath, &arguments, &mut count) {
             Ok(content) => response.push_str(&content),
             Err(e) => return Err(format!("Error reading file {}: {}", filepath, e).into()),
         }
