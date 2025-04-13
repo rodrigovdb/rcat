@@ -99,7 +99,7 @@ pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
         first = false
     }
 
-    return Ok(response);
+    Ok(response)
 }
 
 /**
