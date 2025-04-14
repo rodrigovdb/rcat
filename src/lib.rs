@@ -75,7 +75,6 @@ pub fn usage() {
  */
 pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
-
     let mut first = true;
     let mut count:usize = 1;
 
