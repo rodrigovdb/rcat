@@ -1,5 +1,5 @@
 # Use a Rust base image with Cargo installed
-FROM rust:latest AS builder
+FROM rust:1.86-alpine as builder
 
 ARG APP_HOME=/usr/src/app
 # Set the working directory inside the container
