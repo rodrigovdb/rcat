@@ -31,7 +31,7 @@ impl Arguments {
 
         Ok(Arguments { options, files })
     }
-    
+
     pub fn has_option(&self, option: &str) -> bool {
         self.options.contains(&option.to_string())
     }
@@ -76,7 +76,7 @@ pub fn usage() {
 pub fn cat(arguments: Arguments) -> Result<String, Box<dyn Error>> {
     let mut response = String::new();
     let mut first = true;
-    let mut count:usize = 1;
+    let mut count: usize = 1;
 
     for filepath in arguments.files() {
         // Adds an empty line beween each file.

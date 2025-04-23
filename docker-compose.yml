@@ -1,6 +1,6 @@
 services:
   app:
-    image: rust:latest
+    image: rcat
     build: .
     # env_file:
     #   - .env
