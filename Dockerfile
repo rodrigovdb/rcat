@@ -9,9 +9,11 @@ WORKDIR $APP_HOME
 COPY . .
 
 # Build the dependencies without the actual source code to cache dependencies separately
-RUN cargo build
+# RUN cargo build
+# RUN cargo run --bin rcat -h
 
-# Make the executble available in the final image, if it does not exist.
+# # Make the executble available in the final image, if it does not exist.
 RUN [ ! -e /usr/bin/rcat ] && ln -s ${APP_HOME}/target/debug/rcat /usr/bin/rcat || true
+RUN echo "alias l='ls -laFh --color=auto'" >> ~/.bashrc
 
 CMD ["rcat", "-h"]
